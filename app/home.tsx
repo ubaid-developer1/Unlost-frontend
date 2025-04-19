@@ -30,7 +30,6 @@ import { scheduleGroupedNotifications } from "@/components/ui/reminderService";
 import { BottomSheetContext } from "@/components/ui/profileContext";
 import * as FileSystem from "expo-file-system";
 import { Colors } from "@/constants/Colors";
-import { useAuth } from "@clerk/clerk-expo"; 
 
 
 // Define colors for better maintainability
@@ -43,7 +42,7 @@ const colors = {
 };
 
 const Home = () => {
-   const colorScheme = useColorScheme()
+  const colorScheme = useColorScheme()
   const [searchQuery, setSearchQuery] = useState("");
   const [items, setItems] = useState(null);
   const [selectedItem, setSelectedItem] = useState(null);
@@ -51,7 +50,6 @@ const Home = () => {
   const [isSearchTriggered, setIsSearchTriggered] = useState(false);
   const [ProfilePicture, setProfilePicture] = useState(null);
   const [profile, setprofile] = useState(null);
-  const {signOut} = useAuth()
 
   const fetchItems = async () => {
     if (!searchQuery.trim()) {
@@ -112,7 +110,7 @@ const Home = () => {
       setSelectedItem(null);
       setIsSearchTriggered(false);
       setItems(null);
-  
+
       const configureNotifications = async () => {
         Notifications.setNotificationHandler({
           handleNotification: async () => ({
@@ -122,26 +120,25 @@ const Home = () => {
           }),
         });
       };
-  
+
       configureNotifications();
-  
+
       const checkLastRun = async () => {
         const lastRun = await AsyncStorage.getItem("lastReminderFetch");
         const today = new Date().toISOString().split("T")[0];
-  
-        if (lastRun !== today) {
-          await fetchAndStoreReminders();
-          await AsyncStorage.setItem("lastReminderFetch", today);
-         
-        }
 
-        await scheduleGroupedNotifications(); 
+        // if (lastRun !== today) {
+          await fetchAndStoreReminders();
+          // await AsyncStorage.setItem("lastReminderFetch", today);
+
+        // }
+      
+        // await scheduleGroupedNotifications();
       };
-  
+
       checkLastRun();
-  
       return () => {
-        
+
       };
     }, [])
   );
@@ -165,7 +162,7 @@ const Home = () => {
     useContext(BottomSheetContext);
 
   // Snap points for the bottom sheet
-  
+
 
   const pickImage = async () => {
     // Ask for permission to access the camera/gallery
@@ -186,10 +183,8 @@ const Home = () => {
 
   const handleLogout = async () => {
     await AsyncStorage.removeItem("unlost_user_data");
-    signOut().then(()=>{
-      router.replace("/login");
-    })
-   
+    router.replace("/login");
+
   };
 
   const [username, setusername] = useState("");
@@ -300,11 +295,11 @@ const Home = () => {
               <Feather
                 name="search"
                 size={20}
-                color={colors.gray}
+                color={"black"}
                 style={styles.searchIcon}
               />
               <TextInput
-                placeholder="Find my stuff!"
+                placeholder="Search for Item Here"
                 placeholderTextColor={colors.gray}
                 style={styles.searchBar}
                 value={searchQuery}
@@ -349,10 +344,10 @@ const Home = () => {
           <TouchableOpacity
             disabled={!selectedItem}
             onPress={() => {
-              if(selectedItem){
+              if (selectedItem) {
                 router.push(`/singleItem?id=${selectedItem}`);
               }
-             
+
             }}
             style={[
               styles.button,
@@ -385,7 +380,7 @@ const Home = () => {
               style={styles.buttonIcon}
             />
 
-            <Text style={styles.buttonText}>Save a New Item</Text>
+            <Text style={styles.buttonText}>Add a New Item</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -403,7 +398,7 @@ const Home = () => {
               style={styles.buttonIcon}
             />
             <Link href="/editItem">
-              <Text style={styles.buttonText}>Edit Items</Text>
+              <Text style={[styles.buttonText , {textAlign:"center"}]}>Edit Items</Text>
             </Link>
           </TouchableOpacity>
 
@@ -432,7 +427,7 @@ const Home = () => {
       <BottomSheet
         ref={bottomSheetRef}
         index={-1} // Start closed
-        snapPoints={["25%", "50","80%"]} // Customize snap points as needed
+        snapPoints={["25%", "50", "80%"]} // Customize snap points as needed
         enablePanDownToClose
       >
         <BottomSheetView style={styles.contentContainer}>
@@ -474,7 +469,7 @@ const Home = () => {
             onPress={handleSaveChanges}
           >
             {ProfileLoading ? (
-               <ActivityIndicator size="small" color={colorScheme === "dark" ? "#fff" : "#000"} />
+              <ActivityIndicator size="small" color={colorScheme === "dark" ? "#fff" : "#000"} />
             ) : (
               <Text style={styles.buttonText}>Save Changes</Text>
             )}
@@ -548,8 +543,10 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   button: {
+    display:"flex",
     flexDirection: "row",
     alignItems: "center",
+    justifyContent:"center",
     width: "100%",
     backgroundColor: colors.secondary,
     borderRadius: 12,
@@ -559,9 +556,9 @@ const styles = StyleSheet.create({
   },
   buttonIcon: {
     marginRight: 10,
-    alignSelf: "center",
-    width: "35%",
-    textAlign: "right",
+    // alignSelf: "center",
+    // width: "35%",
+    // textAlign: "right",
   },
   buttonText: {
     color: colors.background,

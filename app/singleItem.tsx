@@ -66,13 +66,13 @@ const SingleItem = () => {
   //   const createdDatesDate = `${createdDate?.getDate()}/${createdDate?.getMonth()+1}/${createdDate?.getFullYear()}`;
   //  const createdDatesTime = `${createdDate?.getHours()}:${createdDate?.getMinutes()}`
 
-  const updatedDatesDate = `${updatedDate.getDate()}-${updatedDate.getMonth() + 1}-${updatedDate.getFullYear()}`;
+  const updatedDatesDate = `${String(updatedDate.getMonth() + 1).padStart(2, '0')}/${String(updatedDate.getDate()).padStart(2, '0')}/${updatedDate.getFullYear()}`;
   const updatedDatesTime = updatedDate.toLocaleString([],{
     minute:"2-digit",
     hour:"2-digit"
   })
 
-  const createdDatesDate = `${createdDate.getDate()}-${createdDate.getMonth() + 1}-${createdDate.getFullYear()}`;
+  const createdDatesDate = `${String(createdDate.getMonth() + 1).padStart(2, '0')}/${String(createdDate.getDate()).padStart(2, '0')}/${createdDate.getFullYear()}`;
   const createdDatesTime = createdDate.toLocaleString([],{
     minute:"2-digit",
     hour:'2-digit'
@@ -97,17 +97,17 @@ const SingleItem = () => {
             
             
             <Text style={styles.value}>
-              {itemData.itemLentOrBorrowed ? itemData.itemLentOrBorrowedPersonName : "Item Not Exchanged Yet"}
+              {itemData.itemLentOrBorrowed ? itemData.itemLentOrBorrowedPersonName : "Item Not Exchanged"}
             </Text>
 
-            <Text style={[styles.label,{textAlign:"center",fontSize:20 , backgroundColor:Colors.light.buttonColor , color:"#fff" , padding:10 , borderRadius:10}]}>ITEM WAS LAST UPDATED</Text>
+            <Text style={[styles.label,{textAlign:"center",fontSize:16 , backgroundColor:Colors.light.buttonColor , color:"#fff" , padding:10 , borderRadius:10}]}>Item Last Updated</Text>
             <Text style={[styles.value, { textAlign: "center" }]}>
               {updatedDatesDate}{"     "}
               {updatedDatesTime}
               {/* Format date if needed */}
             </Text>
 
-            <Text style={[styles.label,{textAlign:"center",fontSize:20 , backgroundColor:Colors.light.buttonColor , color:"#fff" , padding:10 , borderRadius:10}]}>ORIGINAL FILE DATE</Text>
+            <Text style={[styles.label,{textAlign:"center",fontSize:16 , backgroundColor:Colors.light.buttonColor , color:"#fff" , padding:10 , borderRadius:10}]}>Original File Date</Text>
             <Text style={[styles.value, { textAlign: "center" }]}>
               {createdDatesDate}{"     "}
               {createdDatesTime}
@@ -166,7 +166,7 @@ const styles = StyleSheet.create({
     color: "#2C3E50",
   },
   value: {
-    color: "#34495E",
+    color: "black",
     fontSize: 18,
     marginBottom: 16,
     lineHeight: 24,

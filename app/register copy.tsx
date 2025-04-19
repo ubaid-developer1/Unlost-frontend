@@ -1,29 +1,11 @@
-import GoogleSignInButton from '@/components/ui/GoogleButton';
 import { Link, router } from 'expo-router';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator, useColorScheme, ScrollView } from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import withAuthCheck from '@/components/ui/AuthChecker';
+// import withAuthCheck from '@/components/ui/AuthChecker';
 import { environment } from '@/components/ui/environment';
 import { Colors } from '@/constants/Colors';
-import * as Linking from 'expo-linking'
-import { useUser, useAuth, useOAuth } from '@clerk/clerk-expo';
-import * as WebBrowser from 'expo-web-browser'
-
-export const useWarmUpBrowser = () => {
-
-  React.useEffect(() => {
-    // Warm up the android browser to improve UX
-    // https://docs.expo.dev/guides/authentication/#improving-user-experience
-    void WebBrowser.warmUpAsync()
-    return () => {
-      void WebBrowser.coolDownAsync()
-    }
-  }, [])
-}
-
-WebBrowser.maybeCompleteAuthSession()
 
 const Register = () => {
   const [email, setEmail] = useState('');
@@ -32,31 +14,9 @@ const Register = () => {
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
-  const { user } = useUser();
-  const [GoogleLoading, setGoogleLoading] = useState(false)
-  const {isSignedIn , signOut} = useAuth();
-  const { startOAuthFlow } = useOAuth({ strategy: 'oauth_google' })
 
 
   const colorScheme = useColorScheme()
-
-  // Yaha token ki validation
-  //  ...
-  // 
-
-  useEffect(() => {
-    if (isSignedIn && user) {
-      sendGoogleAuthToBackend(
-        user.firstName,
-        user.emailAddresses[0].emailAddress,
-        user.imageUrl
-      ).then(()=>{
-
-      }).catch(()=>{
-        signOut()
-      })
-    }
-  }, [user])
 
   const handleRegister = async () => {
     if (!email || !username || !password) {
@@ -90,69 +50,6 @@ const Register = () => {
       setLoading(false);
     }
   };
-
-  
-  const googlebuttonHandler = useCallback(async () => {
-    setGoogleLoading(true)
-    try {
-      const { createdSessionId, signIn, signUp, setActive } = await startOAuthFlow({
-        redirectUrl: Linking.createURL('/register', { scheme: 'myapp' }),
-      })
-
-      // If sign in was successful, set the active session
-      if (createdSessionId) {
-        setActive!({ session: createdSessionId })
-        if (user){
-          const userName = user.username || `${user.firstName}${user.lastName}001`
-          await sendGoogleAuthToBackend(userName, user.emailAddresses[0].emailAddress , user.imageUrl)
-        }
-      } else {
-        // Use signIn or signUp returned from startOAuthFlow
-        // for next steps, such as MFA
-        setGoogleLoading(false)
-        setMessage("Something went wrong, please try again.");
-      }
-    } catch (err) {
-      setMessage("Something went wrong, please try again.");
-      setGoogleLoading(false)
-      console.error(JSON.stringify(err, null, 2))
-    }
-  }, [])
-
-  const sendGoogleAuthToBackend = async (username: string, email: string, profile: string) => {
-    const userData = { username, email, profile };
-    setGoogleLoading(true);
-  
-    try {
-      const response = await fetch(`${environment.development}/user/authWithGoogle`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(userData),
-      });
-  
-      const data = await response.json();
-  
-      if (response.ok && data.token) {
-        await AsyncStorage.setItem("unlost_user_data", JSON.stringify(data));
-        router.replace("/");
-      } else {
-        setMessage(data.message || "Authentication failed.");
-      }
-    } catch (error) {
-      setMessage("Something went wrong, please try again.");
-    } finally {
-      setGoogleLoading(false);
-    }
-  };
-  
-
-    
-  
-
-
-
 
   return (
     <ScrollView contentContainerStyle={styles.scrollContainer}>
@@ -209,9 +106,6 @@ const Register = () => {
           <Text style={styles.buttonText}>Register</Text>
         )}
       </TouchableOpacity>
-
-      <GoogleSignInButton Title='Register with Google' onPress={googlebuttonHandler}
-        IsLoading={GoogleLoading} />
 
       <Text style={styles.signupText}>
         Already have an account? <Text style={styles.signupLink}><Link href="/login">Login</Link></Text>

@@ -9,6 +9,7 @@ import {
   ScrollView,
   ActivityIndicator,
   useColorScheme,
+  TouchableWithoutFeedback,
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import { FontAwesome5, Ionicons } from "@expo/vector-icons";
@@ -18,15 +19,20 @@ import { environment } from "@/components/ui/environment";
 import { useFocusEffect } from "expo-router";
 import { Colors } from "@/constants/Colors";
 import PremiumModal from "@/components/ui/PremiumModal";
+import CustomHeader from "@/components/ui/CustomHeader";
+import CustomLocModal from "@/components/ui/customLocModal";
 
 const EditLocationsPage = () => {
   const [selectedLocation, setSelectedLocation] = useState(null);
   const [newLocationName, setNewLocationName] = useState("");
   const [selectedDeleteLocation, setSelectedDeleteLocation] = useState(null);
   const [Location, setLocation] = useState([]);
-  const [customLocation, setCustomLocation] = useState([]);
+  const [customLocation, setCustomLocation] = useState(null);
+  const [customLocationLimit, setCustomLocationLimit] = useState();
   const [isSaving, setIsSaving] = useState(false); // For save operation
   const [isDeleting, setIsDeleting] = useState(false); // For delete operation
+  const [custLocVisible, setCustLocVisible] = useState(false);
+  const [fullloading, setFullLoading] = useState(false);
 
   const colorScheme = useColorScheme()
 
@@ -40,6 +46,7 @@ const EditLocationsPage = () => {
   const [visible, setVisible] = useState(false);
 
   const fetchLocations = async () => {
+    setFullLoading(true)
     try {
       const token = (await getUserProfile()).token;
 
@@ -60,11 +67,16 @@ const EditLocationsPage = () => {
         }));
 
         setLocation(fetchedLocations);
+        setCustomLocation(data.customLocation);
+        setCustomLocationLimit(data.limit)
       } else {
         console.error("Error fetching locations:", data.message);
       }
     } catch (error) {
       console.error("Error fetching locations:", error);
+    }
+    finally{
+      setFullLoading(false)
     }
   };
 
@@ -164,117 +176,151 @@ const EditLocationsPage = () => {
   //   );
   // };
 
-  return (
-    <ScrollView contentContainerStyle={styles.scrollContainer}>
-      <View style={styles.container}>
-        {/* Section 1: Edit Location */}
-        <View style={styles.headingContainer}>
-          <Text style={styles.heading}>Edit Location</Text>
-        </View>
-
-
-        <Text style={styles.label}>Select Location</Text>
-        <Picker
-          selectedValue={selectedLocation}
-          onValueChange={(itemValue) => setSelectedLocation(itemValue)}
-          style={styles.picker}
-        >
-          <Picker.Item label="Select a location..." value={null} />
-          {Location.map((loc, index) => (
-            <Picker.Item key={index} label={loc.label} value={loc.value} />
-          ))}
-        </Picker>
-
-        <Text style={styles.label}>Rename Location</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Enter new name"
-          value={newLocationName}
-          onChangeText={setNewLocationName}
+  if (fullloading) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: colorScheme === "dark" ? "#000000" : "#ffffff" }}>
+        <ActivityIndicator
+          size="large"
+          color={colorScheme === "dark" ? "#ffffff" : "#000000"}
         />
-
-        <TouchableOpacity
-          disabled={!selectedLocation || isSaving}
-          style={styles.saveButton}
-          onPress={handleSave}
-        >
-          {isSaving ? (
-            <ActivityIndicator size="small" color={colorScheme === "dark" ? "#fff" : "#000"} />
-          ) : (
-            <>
-              <Ionicons name="save" size={20} color="white" />
-              <Text style={styles.saveButtonText}>Save</Text>
-            </>
-          )}
-        </TouchableOpacity>
-
-        {/* Section 2: Premium - Add Custom Location */}
-        <View
-          style={{
-            flexDirection: "row",
-            gap: 10,
-            justifyContent: "space-between",
-          }}
-        >
-          <Text style={styles.header}>Add Custom Location</Text>
-          <FontAwesome5 name="crown" color="gold" size={25} />
-        </View>
-
-        <TouchableOpacity onPress={() => setVisible(true)} style={[styles.input, styles.disabledInput]}>
-          <Text style={{ color: "grey" }}>
-            Upgrade to Premium to add a custom location
-          </Text>
-        </TouchableOpacity>
-
-        {/* Section 3: Delete Location */}
-        <Text style={styles.header}>Delete Custom Location</Text>
-
-        {/* <Text style={styles.label}>Select Location to Delete</Text> */}
-        <Picker
-          selectedValue={selectedDeleteLocation}
-          onValueChange={(itemValue) => setSelectedDeleteLocation(itemValue)}
-          style={styles.picker}
-        >
-          <Picker.Item label="Select a location..." value={null} />
-          {customLocation.map((loc, index) => (
-            <Picker.Item key={index} label={loc.label} value={loc.value} />
-          ))}
-        </Picker>
-
-        <Text style={styles.warningText}>
-          ⚠️ Warning: Move item to another location before deleting this location to prevent loss of item
-        </Text>
-
-        <TouchableOpacity
-          disabled={!selectedDeleteLocation || isDeleting}
-          style={styles.deleteButton}
-          // onPress={handleDelete}
-        >
-          {isDeleting ? (
-            <ActivityIndicator color="black" />
-          ) : (
-            <>
-              <Ionicons name="trash" size={20} color={"#fff"} />
-              <Text style={styles.deleteButtonText}>Delete</Text>
-            </>
-          )}
-        </TouchableOpacity>
       </View>
+    );
+  }
 
-      <Toast />
+  return (
+    <>
+      <CustomHeader title={"Edit Location"} />
+      <View style={styles.container}>
+        <ScrollView showsVerticalScrollIndicator={false}>
+          {/* Section 1: Edit Location */}
+          <View style={styles.headingContainer}>
+            <Text style={styles.heading}>Edit Location</Text>
+          </View>
 
-      <PremiumModal visible={visible} hideModal={() => setVisible(false)}></PremiumModal>
-    </ScrollView>
+
+          <Text style={styles.label}>Select To Rename</Text>
+          <Picker
+            selectedValue={selectedLocation}
+            onValueChange={(itemValue) => setSelectedLocation(itemValue)}
+            style={styles.picker}
+          >
+            <Picker.Item label="Select a location..." value={null} />
+            {Location.map((loc, index) => (
+              <Picker.Item key={index} label={loc.label} value={loc.value} />
+            ))}
+          </Picker>
+
+          <Text style={styles.label}>Rename Location</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Enter new name"
+            value={newLocationName}
+            onChangeText={setNewLocationName}
+          />
+
+          <TouchableOpacity
+            disabled={!selectedLocation || isSaving}
+            style={styles.saveButton}
+            onPress={handleSave}
+          >
+            {isSaving ? (
+              <ActivityIndicator size="small" color={colorScheme === "dark" ? "#fff" : "#000"} />
+            ) : (
+              <>
+                <Ionicons name="save" size={20} color="white" />
+                <Text style={styles.saveButtonText}>Save</Text>
+              </>
+            )}
+          </TouchableOpacity>
+
+          {/* Section 2: Premium - Add Custom Location */}
+          <View
+            style={{
+              flexDirection: "row",
+              gap: 10,
+              justifyContent: "space-between",
+            }}
+          >
+            <Text style={styles.header}>Add More Locations</Text>
+            <FontAwesome5 name="crown" color="gold" size={25} />
+          </View>
+
+          <TouchableOpacity onPress={() => setVisible(true)} style={[styles.input, styles.disabledInput]}>
+            <Text style={{ color: "black" }}>
+              Upgrade Now to Add 10
+              Custom Locations
+            </Text>
+          </TouchableOpacity>
+
+          {/* Section 3: Delete Location */}
+          <Text style={styles.header}>Delete Custom Location</Text>
+
+          {/* <Text style={styles.label}>Select Location to Delete</Text> */}
+          {
+            customLocationLimit && customLocationLimit > 0 ? (
+              <Picker
+                selectedValue={selectedDeleteLocation}
+                onValueChange={(itemValue) => setSelectedDeleteLocation(itemValue)}
+                style={styles.picker}
+              >
+                <Picker.Item label="Select a location..." value={null} />
+                {customLocation && customLocation.map((loc, index) => (
+                  <Picker.Item key={index} label={loc.label} value={loc.value} />
+                ))}
+              </Picker>
+            ) : (
+              <TouchableOpacity onPress={() => setCustLocVisible(true)}>
+                <View pointerEvents="none">
+                  <Picker
+                    selectedValue={selectedDeleteLocation}
+                    style={styles.picker}
+                  >
+                    <Picker.Item label="Select a location..." value={null} />
+                    {customLocation && customLocation.map((loc, index) => (
+                      <Picker.Item key={index} label={loc.label} value={loc.value} />
+                    ))}
+                  </Picker>
+                </View>
+              </TouchableOpacity>
+            )
+          }
+
+          <Text style={styles.warningText}>
+            ⚠️ Warning: Move all items to another location before deleting this location to prevent loss of items
+          </Text>
+
+          <TouchableOpacity
+            disabled={!selectedDeleteLocation || isDeleting}
+            style={styles.deleteButton}
+          // onPress={handleDelete}
+          >
+            {isDeleting ? (
+              <ActivityIndicator color="black" />
+            ) : (
+              <>
+                <Ionicons name="trash" size={20} color={"#fff"} />
+                <Text style={styles.deleteButtonText}>Delete</Text>
+              </>
+            )}
+          </TouchableOpacity>
+        </ScrollView>
+
+        <Toast />
+
+        <PremiumModal visible={visible} hideModal={() => setVisible(false)}></PremiumModal>
+        <CustomLocModal visible={custLocVisible} hideModal={() => setCustLocVisible(false)}></CustomLocModal>
+      </View>
+    </>
   );
 };
 
 // Styles (unchanged)
 const styles = StyleSheet.create({
-  scrollContainer: {
-    flexGrow: 1,
-    backgroundColor: "#fff",
-    paddingTop:80
-  },
+  // scrollContainer: {
+  //   flexGrow: 1,
+  //   backgroundColor: "#fff",
+  //   paddingTop:80
+  // },
   headingContainer: {
     backgroundColor: Colors.light.buttonColor,
     paddingVertical: 15,
@@ -306,13 +352,13 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   label: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: "600",
     color: Colors.light.buttonColor,
     marginBottom: 5,
+    textTransform: "uppercase",
   },
   picker: {
-    height: 53,
     borderColor: "#ccc",
     borderWidth: 1,
     borderRadius: 5,

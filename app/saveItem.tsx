@@ -9,6 +9,7 @@ import {
   ActivityIndicator,
   useColorScheme,
   Alert,
+  Button,
 } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import { Picker } from "@react-native-picker/picker";
@@ -18,9 +19,13 @@ import { router } from "expo-router";
 import { environment } from "@/components/ui/environment";
 import { Colors } from "@/constants/Colors";
 import PremiumModal from "@/components/ui/PremiumModal";
+import CustomHeader from "@/components/ui/CustomHeader";
+import DateTimePickerModal from 'react-native-modal-datetime-picker';
+import LimitModal from "@/components/ui/LimitModal";
+import AddLimModal from "@/components/ui/addLimitModal";
 
 const ReminderOptions = [
-  { label: "Select Option", value: null },
+  { label: "Select Notification", value: null },
   { label: "Daily", value: "daily" },
   { label: "Weekly", value: "weekly" },
   { label: "Monthly", value: "monthly" },
@@ -30,35 +35,71 @@ const AddItemForm = () => {
   const [selectedLocation, setSelectedLocation] = useState("");
   const [itemName, setItemName] = useState("");
   const [itemsList, setItemsList] = useState([]);
+  const [itemsLimit, setItemsLimit] = useState<number>();
   const [exactLocation, setExactLocation] = useState("");
   const [borrowedTo, setBorrowedTo] = useState("");
   const [isLent, setIsLent] = useState(false);
   const [isBorrow, setIsBorrow] = useState(false);
   const [reminder, setReminder] = useState("");
   const [loading, setLoading] = useState(false);
+  const [fullloading, setFullLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState(""); // For showing form error messages
   const [nameerrorMessage, setNameErrorMessage] = useState(""); // For showing form error messages
   const [reminderrorMessage, setRemindErrorMessage] = useState(""); // For showing form error messages
   const [successMessage, setSuccessMessage] = useState("");
   const [Location, setLocations] = useState([]);
+  const [customLocation, setCustomLocations] = useState(null);
+  const [customLimit, setCustomLimit] = useState(null);
   const [visible, setVisible] = useState(false); // For showing success message
+  const [moreVisible, setMoreVisible] = useState(false); // For showing success message
+  const [limitVisible, setLimitVisible] = useState(false);
+  const [isPickerVisible, setPickerVisible] = useState(false);
+  const [selectedTime, setSelectedTime] = useState(null);
 
   useEffect(() => {
     fetchLocations();
     fetchItems();
   }, []);
 
+  // useEffect(() => {
+  //   const dates = new Date(selectedTime);
+  //   console.log(dates.getHours() , dates.getMinutes())
+  // }, [selectedTime])
+
+  useEffect(() => {
+    if (itemsLimit && itemsList?.length >= itemsLimit) {
+      setLimitVisible(true)
+    } else {
+      setLimitVisible(false)
+    }
+  }, [itemsLimit])
+
   const colorScheme = useColorScheme();
   const handleLocationChange = (itemValue) => {
     const selectedOption = Location.find((loc) => loc.value === itemValue);
 
     if (selectedOption?.premium) {
-      setVisible(true);
       setSelectedLocation("");
+      if (customLimit && customLocation.length >= customLimit) {
+        setVisible(true);
+      } else {
+        setVisible(false);
+        router.push("/editlocation");
+      }
     } else {
       setSelectedLocation(itemValue);
     }
   };
+  const showPicker = () => setPickerVisible(true);
+  const hidePicker = () => setPickerVisible(false);
+
+  const handleConfirm = (time) => {
+    setSelectedTime(time);
+    hidePicker();
+  };
+
+  const formatTime = (date) =>
+    date?.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
   const handleItemNameChange = (text) => setItemName(text);
   const handleExactLocationChange = (text) => setExactLocation(text);
   const handleBorrowedToChange = (text) => {
@@ -73,6 +114,7 @@ const AddItemForm = () => {
   }
 
   const fetchItems = async () => {
+    setFullLoading(true)
     try {
       const token = (await getUserProfile()).token;
 
@@ -88,6 +130,7 @@ const AddItemForm = () => {
 
       if (response.ok) {
         setItemsList(data.items);
+        setItemsLimit(data.limit);
       } else {
         throw new Error(data.message || "Error fetching items");
       }
@@ -98,9 +141,13 @@ const AddItemForm = () => {
         text2: error.message || "An error occurred while fetching items.",
       });
     }
+    finally {
+      setFullLoading(false)
+    }
   };
 
   const fetchLocations = async () => {
+    setFullLoading(true)
     try {
       const token = (await getUserProfile()).token;
 
@@ -115,6 +162,8 @@ const AddItemForm = () => {
       const data = await response.json();
 
       if (response.ok) {
+        setCustomLocations(data.customLocation);
+        setCustomLimit(data.limit)
         // Map the response data to the correct structure (locationName as label)
         const fetchedLocations = data.locations.map((location) => ({
           label: location.locationName,
@@ -141,15 +190,13 @@ const AddItemForm = () => {
     } catch (error) {
       console.error("Error fetching locations:", error);
     }
+    finally {
+      setFullLoading(false)
+    }
   };
   const handleSubmit = async () => {
-    if (itemsList?.length >= 100) {
-      console.log(itemsList?.length)
-      Toast.show({
-        type: "error",
-        text1: "Limit Exceeded",
-        text2: "You can't go above 100 items!"
-      });
+    if (itemsList?.length >= itemsLimit) {
+      setLimitVisible(true)
       return;
     }
     if (!itemName || !selectedLocation || !exactLocation) {
@@ -165,12 +212,20 @@ const AddItemForm = () => {
       setRemindErrorMessage("Reminder is Required!");
       return;
     }
+    if ((isLent || isBorrow) && !selectedTime) {
+      setRemindErrorMessage("Reminder is Required!");
+      return;
+    }
 
     setLoading(true);
     setErrorMessage("");
     setNameErrorMessage("");
     setRemindErrorMessage("");
     setSuccessMessage("");
+
+    const dates = new Date(selectedTime);
+    const hour = dates.getHours();
+    const minute = dates.getMinutes();
 
     const token = (await getUserProfile()).token;
     try {
@@ -187,6 +242,8 @@ const AddItemForm = () => {
           itemReminder: (isLent || isBorrow) ? reminder : "",
           itemLentOrBorrowed: isLent ? "lent" : isBorrow ? "borrow" : "",
           itemLentOrBorrowedPersonName: (isLent || isBorrow) ? borrowedTo : "",
+          hours: (isLent || isBorrow) ? hour : 0,
+          minutes: (isLent || isBorrow) ? minute : 0,
         }),
       });
 
@@ -215,147 +272,221 @@ const AddItemForm = () => {
     }
   };
 
+  if (fullloading) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: colorScheme === "dark" ? "#000000" : "#ffffff" }}>
+        <ActivityIndicator
+          size="large"
+          color={colorScheme === "dark" ? "#ffffff" : "#000000"}
+        />
+      </View>
+    );
+  }
+
   return (
-    <ScrollView contentContainerStyle={styles.scrollView}>
+    <>
+      <CustomHeader title={"Save Item"} />
       <View style={styles.container}>
-        <View style={styles.headingContainer}>
-          <Text style={styles.heading}>Add Item</Text>
-        </View>
+        <ScrollView showsVerticalScrollIndicator={false}>
+          <View style={styles.headingContainer}>
+            <Text style={styles.heading}>Add a new Item</Text>
+          </View>
 
-        <Text style={styles.label}>Select Location</Text>
-        <Picker
-          selectedValue={selectedLocation}
-          onValueChange={handleLocationChange}
-          style={styles.dropdown}
-        >
-          {Location.map((location, index) => (
-            <Picker.Item
-              key={index}
-              label={
-                location.premium ? `${location.label}   👑` : location.label
-              }
-              value={location.value}
-              color={location.premium ? "grey" : "black"}
-            />
-          ))}
-        </Picker>
-
-        <Text style={styles.label}>Name of the Item</Text>
-        <TextInput
-          style={styles.input}
-          value={itemName}
-          onChangeText={handleItemNameChange}
-          placeholder="Enter item name"
-        />
-        {errorMessage && !itemName && (
-          <Text style={styles.errorText}>{errorMessage}</Text>
-        )}
-
-        <Text style={styles.label}>Detail Exact Location</Text>
-        <TextInput
-          style={styles.input}
-          value={exactLocation}
-          onChangeText={handleExactLocationChange}
-          placeholder="Description"
-        />
-        {errorMessage && !exactLocation && (
-          <Text style={styles.errorText}>{errorMessage}</Text>
-        )}
-
-        <Text style={styles.label}>Item Borrowed or Lent</Text>
-        <View style={styles.radioContainer}>
-          <TouchableOpacity
-            style={[styles.radioButton, isLent && styles.selected]}
-            onPress={() => {
-              setIsLent(!isLent)
-              setIsBorrow(false)
-            }}
+          <Text style={styles.label}>Choose Where To Save</Text>
+          <Picker
+            selectedValue={selectedLocation}
+            onValueChange={handleLocationChange}
+            style={styles.dropdown}
           >
-            <Text style={styles.radioText}>Lent</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.radioButton, isBorrow && styles.selected]}
-            onPress={() => {
-              setIsBorrow(!isBorrow)
-              setIsLent(false)
-            }}
-          >
-            <Text style={styles.radioText}>Borrowed</Text>
-          </TouchableOpacity>
-        </View>
+            {Location.map((location, index) => (
+              <Picker.Item
+                key={index}
+                label={
+                  location.premium ? `${location.label}   👑` : location.label
+                }
+                value={location.value}
+                color={location.premium ? "grey" : "black"}
+              />
+            ))}
+          </Picker>
 
-        {(isLent || isBorrow) && (
+          <Text style={styles.label}>Name of the Item</Text>
           <TextInput
             style={styles.input}
-            value={borrowedTo}
-            onChangeText={handleBorrowedToChange}
-            placeholder="Name of person the item was lent to / borrowed from"
+            value={itemName}
+            onChangeText={handleItemNameChange}
+            placeholder="Enter item name"
           />
-        )}
-
-        {nameerrorMessage && (
-          <Text style={styles.errorText}>{nameerrorMessage}</Text>
-        )}
-        {
-          (isLent || isBorrow) && (
-            <>
-              <Text style={styles.label}>Reminder</Text>
-              <Picker
-                selectedValue={reminder}
-                onValueChange={handleReminderChange}
-                style={styles.dropdown}
-              >
-                {ReminderOptions.map((option, index) => (
-                  <Picker.Item
-                    key={index}
-                    label={option.label}
-                    value={option.value}
-                  />
-                ))}
-              </Picker>
-            </>
-          )
-        }
-        {reminderrorMessage && (
-          <Text style={styles.errorText}>{reminderrorMessage}</Text>
-        )}
-        <TouchableOpacity
-          style={styles.button}
-          onPress={handleSubmit}
-          disabled={loading}
-        >
-          {loading ? (
-            <ActivityIndicator
-              size="small"
-              color={colorScheme === "dark" ? "#fff" : "#000"}
-            />
-          ) : (
-            <Text style={styles.buttonText}>Save Item</Text>
+          {errorMessage && !itemName && (
+            <Text style={styles.errorText}>{errorMessage}</Text>
           )}
-        </TouchableOpacity>
 
-        {successMessage && (
-          <Text style={styles.successText}>{successMessage}</Text>
-        )}
-        {errorMessage && !successMessage && (
-          <Text style={styles.errorText}>{errorMessage}</Text>
-        )}
+          <Text style={styles.label}>Exact Location Details</Text>
+          <TextInput
+            style={styles.input}
+            value={exactLocation}
+            onChangeText={handleExactLocationChange}
+            placeholder="Description"
+          />
+          {errorMessage && !exactLocation && (
+            <Text style={styles.errorText}>{errorMessage}</Text>
+          )}
 
-        <PremiumModal
-          visible={visible}
-          hideModal={() => setVisible(false)}
-        ></PremiumModal>
-        <Toast />
+          <Text style={styles.label}>Select If Borrowed or Lent</Text>
+          <View style={styles.radioContainer}>
+            <TouchableOpacity
+              style={[styles.radioButton, isLent && styles.selected]}
+              onPress={() => {
+                setIsLent(!isLent)
+                setIsBorrow(false)
+              }}
+            >
+              <Text style={styles.radioText}>Lent</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.radioButton, isBorrow && styles.selected]}
+              onPress={() => {
+                setIsBorrow(!isBorrow)
+                setIsLent(false)
+              }}
+            >
+              <Text style={styles.radioText}>Borrowed</Text>
+            </TouchableOpacity>
+          </View>
+
+          {(isLent || isBorrow) && (
+            <TextInput
+              style={styles.input}
+              value={borrowedTo}
+              onChangeText={handleBorrowedToChange}
+              placeholder="Type name of person"
+            />
+          )}
+
+          {nameerrorMessage && (
+            <Text style={styles.errorText}>{nameerrorMessage}</Text>
+          )}
+          {
+            (isLent || isBorrow) && (
+              <>
+                <Text style={styles.label}>Set a Reminder</Text>
+                <Picker
+                  selectedValue={reminder}
+                  onValueChange={handleReminderChange}
+                  style={styles.dropdown}
+                >
+                  {ReminderOptions.map((option, index) => (
+                    <Picker.Item
+                      key={index}
+                      label={option.label}
+                      value={option.value}
+                    />
+                  ))}
+                </Picker>
+              </>
+            )
+          }
+          {
+            (isLent || isBorrow) && (
+              <>
+                <TouchableOpacity
+                  style={styles.timeModal}
+                  onPress={showPicker}
+                >
+                  {selectedTime ? (
+                    <Text style={styles.timeModalText}>
+                      {formatTime(selectedTime)}
+                    </Text>
+                  ) : (
+                    <Text style={styles.timeModalText}>Select Time</Text>
+                  )
+                  }
+                </TouchableOpacity>
+                {/* <Button title="Select Time" onPress={showPicker} /> */}
+                <DateTimePickerModal
+                  isVisible={isPickerVisible}
+                  mode="time"
+                  onConfirm={handleConfirm}
+                  onCancel={hidePicker}
+                  is24Hour={false} // this enables AM/PM format
+                />
+
+              </>
+            )
+          }
+          {reminderrorMessage && (
+            <Text style={styles.errorTextTwo}>{reminderrorMessage}</Text>
+          )}
+          <TouchableOpacity
+            style={styles.button}
+            onPress={handleSubmit}
+            disabled={loading}
+          >
+            {loading ? (
+              <ActivityIndicator
+                size="small"
+                color={colorScheme === "dark" ? "#fff" : "#000"}
+              />
+            ) : (
+              <Text style={styles.buttonText}>Save</Text>
+            )}
+          </TouchableOpacity>
+
+          {successMessage && (
+            <Text style={styles.successText}>{successMessage}</Text>
+          )}
+          {errorMessage && !successMessage && (
+            <Text style={styles.errorText}>{errorMessage}</Text>
+          )}
+          {
+            itemsLimit && (
+              <View style={{ marginTop: 15, display: "flex", flexDirection: "column", alignItems: "center" }}>
+                <Text style={{ fontSize: 20, fontWeight: "500" }}>{itemsList.length} of {itemsLimit} Items Saved</Text>
+                <TouchableOpacity
+                  // style={styles.button}
+                  onPress={() => setMoreVisible(true)}
+                // disabled={loading}
+                >
+                  <Text style={{ color: Colors.light.buttonColor, fontSize: 17, fontWeight: "500" }}>Add 50 More Now</Text>
+                </TouchableOpacity>
+              </View>
+            )
+          }
+
+          <PremiumModal
+            visible={visible}
+            hideModal={() => setVisible(false)}
+          ></PremiumModal>
+          <AddLimModal visible={moreVisible}
+            hideModal={() => setMoreVisible(false)}></AddLimModal>
+
+          <LimitModal
+            visible={limitVisible}
+            hideModal={() => setLimitVisible(false)}
+          >
+          </LimitModal>
+          <Toast />
+        </ScrollView>
       </View>
-    </ScrollView>
+    </>
   );
 };
 
 const styles = StyleSheet.create({
-  scrollView: {
-    flexGrow: 1,
-    backgroundColor: Colors.light.backGroundColor,
-    paddingTop: 80
+  // scrollView: {
+  //   flexGrow: 1,
+  //   backgroundColor: Colors.light.backGroundColor,
+  //   paddingTop: 80
+  // },
+  timeModal: {
+    backgroundColor: "#cfcec4",
+    paddingLeft: 17,
+    paddingTop: 10,
+    paddingBottom: 10,
+    borderRadius: 5
+  },
+  timeModalText: {
+    fontSize: 16
   },
   headingContainer: {
     backgroundColor: Colors.light.buttonColor,
@@ -375,7 +506,7 @@ const styles = StyleSheet.create({
   },
 
   heading: {
-    fontSize: 30,
+    fontSize: 25,
     fontWeight: "bold",
     textAlign: "center",
     color: Colors.light.backGroundColor,
@@ -383,10 +514,11 @@ const styles = StyleSheet.create({
     letterSpacing: 1.5,
   },
   label: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: "500",
     color: Colors.light.buttonColor,
     marginBottom: 8,
+    textTransform: "uppercase",
   },
   input: {
     height: 55,
@@ -399,7 +531,6 @@ const styles = StyleSheet.create({
   dropdown: {
     backgroundColor: "#FFF",
     marginBottom: 16,
-    height: 53,
     borderRadius: 5,
   },
   radioContainer: {
@@ -422,7 +553,7 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
   button: {
-    backgroundColor: Colors.light.buttonColor,
+    backgroundColor: "green",
     paddingVertical: 12,
     borderRadius: 8,
     alignItems: "center",
@@ -437,6 +568,12 @@ const styles = StyleSheet.create({
     color: "red",
     fontSize: 14,
     marginBottom: 10,
+  },
+  errorTextTwo: {
+    color: "red",
+    fontSize: 14,
+    marginBottom: 10,
+    marginTop: 6
   },
   successText: {
     color: "green",

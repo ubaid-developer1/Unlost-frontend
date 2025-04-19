@@ -15,7 +15,6 @@ import { Alert, View, ActivityIndicator } from "react-native"; // Import Activit
 import HeaderWithMenu from "@/components/ui/ProfileMenu";
 import * as Notifications from "expo-notifications";
 import { BottomSheetProvider } from "@/components/ui/profileContext";
-import { ClerkLoaded, ClerkProvider } from "@clerk/clerk-expo";
 import { environment } from "@/components/ui/environment";
 import { PaperProvider } from "react-native-paper";
 
@@ -59,71 +58,65 @@ export default function RootLayout() {
 
   return (
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-      <ClerkProvider
-        publishableKey={environment.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY}
-      >
-        {/* <ClerkLoaded> */}
-        <PaperProvider>
+      <PaperProvider>
 
 
-          <BottomSheetProvider>
-            <Stack
-              screenOptions={{
-                headerStyle: {
-                  backgroundColor: colorScheme === "dark" ? "#333" : "#fff", // Dark or light background for header
-                },
-                headerTintColor: colorScheme === "dark" ? "#fff" : "#000", // Set header text color to white in dark mode, black in light mode
-                headerTitleStyle: {
-                  fontWeight: "bold", // Optional: Make header text bold
-                },
+        <BottomSheetProvider>
+          <Stack
+            screenOptions={{
+              headerStyle: {
+                backgroundColor: colorScheme === "dark" ? "#333" : "#fff", // Dark or light background for header
+              },
+              headerTintColor: colorScheme === "dark" ? "#fff" : "#000", // Set header text color to white in dark mode, black in light mode
+              headerTitleStyle: {
+                fontWeight: "bold", // Optional: Make header text bold
+              },
+            }}
+          >
+            <Stack.Screen name="index" options={{ headerShown: false }} />
+            <Stack.Screen
+              name="home"
+              options={{
+                title: "",
+                headerLeft: () => <HeaderWithMenu />,
               }}
-            >
-              <Stack.Screen name="index" options={{ headerShown: false }} />
-              <Stack.Screen
-                name="home"
-                options={{
-                  title: "",
-                  headerLeft: () => <HeaderWithMenu />,
-                }}
-              />
-              <Stack.Screen name="login" options={{ headerShown: false }} />
-              <Stack.Screen name="register" options={{ headerShown: false }} />
-              <Stack.Screen
-                name="singleItem"
-                options={{ headerTitle: "Item Information" }}
-              />
-              <Stack.Screen
-                name="saveItem"
-                options={{ headerTitle: "Save Item" , headerTransparent:true}}
-              />
-              <Stack.Screen
+            />
+            <Stack.Screen name="login" options={{ headerShown: false }} />
+            <Stack.Screen name="register" options={{ headerShown: false }} />
+            <Stack.Screen
+              name="singleItem"
+              options={{ headerTitle: "Item Information" }}
+            />
+            <Stack.Screen
+              name="saveItem"
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen
 
-                name="editItem"
-                options={{ headerTitle: "Edit Item" , headerTransparent:true }}
-              />
-              <Stack.Screen
-                name="editlocation"
-                options={{ headerTitle: "Edit Location" , headerTransparent:true}}
-              />
-              <Stack.Screen
-                name="forgetpassword"
-                options={{ headerShown: false }}
-              />
-              <Stack.Screen
-                name="resetpassword"
-                options={{ headerTitle: "Reset Password" }}
-              />
-              <Stack.Screen
-                name="verifyotp"
-                options={{ headerTitle: "Verify OTP" }}
-              />
-            </Stack>
+              name="editItem"
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen
+              name="editlocation"
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen
+              name="forgetpassword"
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen
+              name="resetpassword"
+              options={{ headerTitle: "Reset Password" }}
+            />
+            <Stack.Screen
+              name="verifyotp"
+              options={{ headerTitle: "Verify OTP" }}
+            />
+          </Stack>
 
-            <StatusBar style="auto" />
-          </BottomSheetProvider>
-        </PaperProvider>
-        {/* </ClerkLoaded> */}
-      </ClerkProvider>
+          <StatusBar style="auto" />
+        </BottomSheetProvider>
+      </PaperProvider>
     </ThemeProvider>
   );
 }

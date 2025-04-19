@@ -7,7 +7,11 @@ import { scheduleGroupedNotifications } from "./reminderService";
 export interface ReminderItem {
   id: string;
   name: string;
-  frequency: "daily" | "weekly" | "monthly"; // Added "monthly"
+  frequency: "daily" | "weekly" | "monthly"; // Added "monthly";
+  lentBorrow: "lent" | "borrow";
+  personName:string;
+  hour:number;
+  minute:number;
 }
 
 // ✅ Fetch reminders from API and store them locally
@@ -26,11 +30,14 @@ export const fetchAndStoreReminders = async () => {
     const data: ReminderItem[] = await response.json();
 
     if (data.length > 0) {
-      console.log("DB Data: ",data)
+      console.log(data , data.length)
       await AsyncStorage.setItem("reminderItems", JSON.stringify(data));
       console.log("Reminders stored successfully!");
 
       // ✅ Schedule notifications after storing reminders
+      await scheduleGroupedNotifications();
+    }else{
+      await AsyncStorage.removeItem("reminderItems");
       await scheduleGroupedNotifications();
     }
   } catch (error) {

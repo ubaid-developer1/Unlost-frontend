@@ -2,22 +2,18 @@ import React from 'react';
 import { Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Modal, Portal } from 'react-native-paper';
 
-const PremiumModal = ({ visible, hideModal }) => {
+const AddLimModal = ({ visible, hideModal }) => {
   return (
     <Portal>
       <Modal visible={visible} onDismiss={hideModal} contentContainerStyle={styles.container}>
         <Text style={styles.header}>UN-LOST</Text>
         
         <Text style={styles.title}>
-          Do You Need More Locations to Save Your Items?
-        </Text>
-
-        <Text style={styles.description}>
-          You’ve reached your limit of location fields but you can add more
+          Do You Need to Save More Items?
         </Text>
 
         <Text style={styles.unlockText}>
-          Unlock 10 More Customizable Locations!
+          Increase your Limit to save 50 More Items!
         </Text>
 
         <Text style={styles.priceText}>One-Time Purchase Only $5</Text>
@@ -99,4 +95,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default PremiumModal;
+export default AddLimModal;

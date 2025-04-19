@@ -18,8 +18,14 @@
             "CFBundleURLSchemes": [
               "myapp"
             ]
+          },
+          {
+            "CFBundleURLSchemes": [
+              "myapp"
+            ]
           }
-        ]
+        ],
+        "ITSAppUsesNonExemptEncryption": false
       }
     },
     "jsEngine": "hermes",
@@ -59,9 +65,6 @@
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"
         }
-      ],
-      [
-        "@react-native-google-signin/google-signin"
       ]
     ],
     "experiments": {
@@ -72,9 +75,9 @@
         "origin": false
       },
       "eas": {
-        "projectId": "a4645d44-1bbf-42ea-ada3-afe345b18db0"
+        "projectId": "8302af63-a594-4102-a888-2c034f176627"
       }
     },
-    "owner": "muhammad.dev2002"
+    "owner": "admin510"
   }
 }

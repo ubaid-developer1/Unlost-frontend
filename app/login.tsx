@@ -1,46 +1,20 @@
-import React, { useCallback, useEffect, useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator, useColorScheme, ScrollView } from "react-native";
-import { Link, Redirect, router } from "expo-router";
+import React, { useState } from "react";
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator, useColorScheme, ScrollView, Image } from "react-native";
+import { Link, router } from "expo-router";
 import Icon from "react-native-vector-icons/Feather";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Feather } from "@expo/vector-icons";
-import GoogleSignInButton from "@/components/ui/GoogleButton";
-import withAuthCheck from "@/components/ui/AuthChecker";
 import { environment } from "@/components/ui/environment";
-import * as WebBrowser from 'expo-web-browser'
 import { Colors } from "@/constants/Colors";
-import * as Linking from 'expo-linking'
-import { SignedIn, useAuth, useOAuth, useUser } from "@clerk/clerk-expo";
-import { getUserProfile } from "@/components/ui/UserProfile";
-
-export const useWarmUpBrowser = () => {
-
-  React.useEffect(() => {
-    // Warm up the android browser to improve UX
-    // https://docs.expo.dev/guides/authentication/#improving-user-experience
-    void WebBrowser.warmUpAsync()
-    return () => {
-      void WebBrowser.coolDownAsync()
-    }
-  }, [])
-}
-
-WebBrowser.maybeCompleteAuthSession()
 
 const Login = () => {
-  useWarmUpBrowser()
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [loading, setLoading] = useState(false); // State for handling loading indicator
   const [message, setMessage] = useState("");
-  const { startOAuthFlow } = useOAuth({ strategy: 'oauth_google' })
-  const { user } = useUser();
-  const { isSignedIn, signOut } = useAuth();
 
+  const colorScheme = useColorScheme();
 
-
-  const colorScheme = useColorScheme()
   const handleLogin = async () => {
     if (!email || !password) {
       setMessage("Please fill in all fields.");
@@ -75,79 +49,18 @@ const Login = () => {
     }
   };
 
-  const [GoogleLoading, setGoogleLoading] = useState(false)
-
-  const googlebuttonHandler = useCallback(async () => {
-    setGoogleLoading(true)
-    try {
-      const { createdSessionId, signIn, signUp, setActive } = await startOAuthFlow({
-        redirectUrl: Linking.createURL('/login', { scheme: 'myapp' }),
-      })
-
-      // If sign in was successful, set the active session
-      if (createdSessionId) {
-        setActive!({ session: createdSessionId })
-        if (user) {
-          console.log("inv")
-          const userName = user.username || `${user.firstName}${user.lastName}001`
-          await sendGoogleAuthToBackend(userName, user.emailAddresses[0].emailAddress, user.imageUrl)
-        }
-      } else {
-        console.log()
-        // Use signIn or signUp returned from startOAuthFlow
-        // for next steps, such as MFA
-        setGoogleLoading(false)
-        setMessage("Something went wrong, please try again.");
-      }
-    } catch (err) {
-      // See https://clerk.com/docs/custom-flows/error-handling
-      // for more info on error handling
-      setGoogleLoading(false)
-      setMessage("Something went wrong, please try again.");
-      console.error(JSON.stringify(err, null, 2))
-    }
-  }, [])
-
-  const sendGoogleAuthToBackend = async (username: string, email: string, profile: string) => {
-    const userData = { username, email, profile };
-    setGoogleLoading(true);
-
-    try {
-      const response = await fetch(`${environment.development}/user/authWithGoogle`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(userData),
-      });
-
-      const data = await response.json();
-
-      if (response.ok && data.token) {
-        await AsyncStorage.setItem("unlost_user_data", JSON.stringify(data));
-        router.replace("/");
-      } else {
-        setMessage(data.message || "Authentication failed.");
-      }
-    } catch (error) {
-      setMessage("Something went wrong, please try again.");
-    } finally {
-      setGoogleLoading(false);
-    }
-  };
-
 
   return (
 
     <ScrollView contentContainerStyle={styles.scrollContainer}>
       <View style={styles.container}>
         <View style={styles.headingContainer}>
-          <Text style={styles.heading}>UN-LOST</Text>
+          <Text style={styles.heading}>Un-Lost</Text>
         </View>
         <Text
           style={{
             textAlign: "center",
-            color: "gray",
+            color: "black",
             marginBottom: 10,
             marginTop: 5,
             fontSize: 18,
@@ -156,11 +69,9 @@ const Login = () => {
           Keep track of all your items and never forget where they are again
         </Text>
 
-        <Feather
-          style={{ marginTop: 10, marginBottom:40, fontWeight: "bold" }}
-          name="search"
-          size={45}
-          color="black"
+        <Image
+          source={require('../assets/images/splash-icon.png')} // ya URI se bhi ho sakta hai
+          style={{ width: 65, height: 65, marginTop: 10, marginBottom: 40 }}
         />
 
         {/* Email Input */}
@@ -205,28 +116,26 @@ const Login = () => {
           )}
         </TouchableOpacity>
 
-        <Text style={styles.signupText}>
-          Don't remember your password?{" "}
-          <Text style={styles.signupLink}>
-            <Link href="/forgetpassword">Forget password</Link>
-          </Text>
+        <Text style={styles.info}>
+          Info is case sensitive
         </Text>
-
-        <GoogleSignInButton
-          Title="Login with Google"
-          onPress={googlebuttonHandler}
-          IsLoading={GoogleLoading}
-        />
 
         <Text style={styles.signupText}>
           Don't have an account?{" "}
           <Text style={styles.signupLink}>
-            <Link href="/register">Register</Link>
+            <Link href="/register" style={{ color: Colors.light.buttonColor }}>Register Here</Link>
+          </Text>
+        </Text>
+        <Text style={styles.signupText}>
+          Click Here for{" "}
+          <Text style={styles.signupLink}>
+            <Link href="/forgetpassword" style={{ color: Colors.light.buttonColor }}>Lost Password</Link>
           </Text>
         </Text>
       </View>
     </ScrollView>
   );
+
 
 };
 
@@ -247,7 +156,6 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "#fff",
     textAlign: "center",
-    textTransform: "uppercase",
     letterSpacing: 5,
     fontFamily: "Poppins-Bold",
     textShadowColor: "rgba(0, 0, 0, 0.2)",
@@ -307,6 +215,13 @@ const styles = StyleSheet.create({
     marginTop: 20,
     fontSize: 14,
     color: "#000",
+    textAlign:"center"
+  },
+  info: {
+    marginTop: 10,
+    fontSize: 16,
+    color: "#000",
+    fontWeight: "500",
   },
   signupLink: {
     color: "#000",
