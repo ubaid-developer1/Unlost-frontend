@@ -1,0 +1,100 @@
+[debug] [2025-04-26T10:47:11.634Z] ----------------------------------------------------------------------
+[debug] [2025-04-26T10:47:11.637Z] Command:       /usr/local/bin/firebase /Users/hammadahmad/.cache/firebase/tools/lib/node_modules/firebase-tools/lib/bin/firebase init functions
+[debug] [2025-04-26T10:47:11.639Z] CLI Version:   12.7.0
+[debug] [2025-04-26T10:47:11.639Z] Platform:      darwin
+[debug] [2025-04-26T10:47:11.640Z] Node Version:  v16.16.0
+[debug] [2025-04-26T10:47:11.650Z] Time:          Sat Apr 26 2025 05:47:11 GMT-0500 (Central Daylight Time)
+[debug] [2025-04-26T10:47:11.651Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2025-04-26T10:47:11.662Z] >>> [apiv2][query] GET https://firebase-public.firebaseio.com/cli.json [none]
+[debug] [2025-04-26T10:47:11.856Z] Object "" in "firebase.json" has unknown property: {"additionalProperty":"flutter"}
+[debug] [2025-04-26T10:47:11.868Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2025-04-26T10:47:11.868Z] > authorizing via signed-in user (hammad.ahmad2000@gmail.com)
+[debug] [2025-04-26T10:47:11.871Z] Object "" in "firebase.json" has unknown property: {"additionalProperty":"flutter"}
+[info] 
+     ######## #### ########  ######## ########     ###     ######  ########
+     ##        ##  ##     ## ##       ##     ##  ##   ##  ##       ##
+     ######    ##  ########  ######   ########  #########  ######  ######
+     ##        ##  ##    ##  ##       ##     ## ##     ##       ## ##
+     ##       #### ##     ## ######## ########  ##     ##  ######  ########
+
+You're about to initialize a Firebase project in this directory:
+
+  /Users/hammadahmad/FlutterProjects/unstop
+
+Before we get started, keep in mind:
+
+  * You are initializing within an existing Firebase project directory
+
+[info] 
+=== Project Setup
+[info] 
+[info] First, let's associate this project directory with a Firebase project.
+[info] You can create multiple project aliases by running firebase use --add, 
+[info] but for now we'll just set up a default project.
+[info] 
+[debug] [2025-04-26T10:47:12.517Z] <<< [apiv2][status] GET https://firebase-public.firebaseio.com/cli.json 200
+[debug] [2025-04-26T10:47:12.521Z] <<< [apiv2][body] GET https://firebase-public.firebaseio.com/cli.json {"cloudBuildErrorAfter":1594252800000,"cloudBuildWarnAfter":1590019200000,"defaultNode10After":1594252800000,"minVersion":"3.0.5","node8DeploysDisabledAfter":1613390400000,"node8RuntimeDisabledAfter":1615809600000,"node8WarnAfter":1600128000000}
+[debug] [2025-04-26T10:47:42.449Z] > refreshing access token with scopes: []
+[debug] [2025-04-26T10:47:42.482Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-04-26T10:47:42.485Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-04-26T10:47:43.124Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2025-04-26T10:47:43.126Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-04-26T10:47:43.156Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects pageSize=100
+[debug] [2025-04-26T10:47:44.075Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects 200
+[debug] [2025-04-26T10:47:44.080Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects [omitted]
+[info] i  Don't want to scroll through all your projects? If you know your project ID, you can initialize it directly using firebase init --project <project_id>.
+ 
+[info] i  Using project unstop-c3b18 (unstop) 
+[info] 
+=== Functions Setup
+[debug] [2025-04-26T10:47:51.937Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2025-04-26T10:47:51.938Z] > authorizing via signed-in user (hammad.ahmad2000@gmail.com)
+[debug] [2025-04-26T10:47:51.938Z] [iam] checking project unstop-c3b18 for permissions ["firebase.projects.get"]
+[debug] [2025-04-26T10:47:51.941Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/unstop-c3b18:testIamPermissions [none]
+[debug] [2025-04-26T10:47:51.941Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/unstop-c3b18:testIamPermissions x-goog-quota-user=projects/unstop-c3b18
+[debug] [2025-04-26T10:47:51.941Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/unstop-c3b18:testIamPermissions {"permissions":["firebase.projects.get"]}
+[debug] [2025-04-26T10:47:53.592Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/unstop-c3b18:testIamPermissions 200
+[debug] [2025-04-26T10:47:53.593Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/unstop-c3b18:testIamPermissions {"permissions":["firebase.projects.get"]}
+[debug] [2025-04-26T10:47:53.604Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/unstop-c3b18/services/cloudfunctions.googleapis.com [none]
+[debug] [2025-04-26T10:47:53.605Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/unstop-c3b18/services/cloudfunctions.googleapis.com x-goog-quota-user=projects/unstop-c3b18
+[debug] [2025-04-26T10:47:53.616Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/unstop-c3b18/services/runtimeconfig.googleapis.com [none]
+[debug] [2025-04-26T10:47:53.617Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/unstop-c3b18/services/runtimeconfig.googleapis.com x-goog-quota-user=projects/unstop-c3b18
+[debug] [2025-04-26T10:47:55.396Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/unstop-c3b18/services/runtimeconfig.googleapis.com 200
+[debug] [2025-04-26T10:47:55.396Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/unstop-c3b18/services/runtimeconfig.googleapis.com [omitted]
+[debug] [2025-04-26T10:47:55.405Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/unstop-c3b18/services/cloudfunctions.googleapis.com 200
+[debug] [2025-04-26T10:47:55.406Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/unstop-c3b18/services/cloudfunctions.googleapis.com [omitted]
+[debug] [2025-04-26T10:47:55.407Z] >>> [apiv2][query] POST https://serviceusage.googleapis.com/v1/projects/unstop-c3b18/services/cloudfunctions.googleapis.com:enable [none]
+[debug] [2025-04-26T10:47:55.407Z] >>> [apiv2][(partial)header] POST https://serviceusage.googleapis.com/v1/projects/unstop-c3b18/services/cloudfunctions.googleapis.com:enable x-goog-quota-user=projects/unstop-c3b18
+[debug] [2025-04-26T10:47:57.488Z] <<< [apiv2][status] POST https://serviceusage.googleapis.com/v1/projects/unstop-c3b18/services/cloudfunctions.googleapis.com:enable 200
+[debug] [2025-04-26T10:47:57.490Z] <<< [apiv2][body] POST https://serviceusage.googleapis.com/v1/projects/unstop-c3b18/services/cloudfunctions.googleapis.com:enable [omitted]
+[debug] [2025-04-26T10:48:07.574Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/unstop-c3b18/services/cloudfunctions.googleapis.com [none]
+[debug] [2025-04-26T10:48:07.583Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/unstop-c3b18/services/cloudfunctions.googleapis.com x-goog-quota-user=projects/unstop-c3b18
+[debug] [2025-04-26T10:48:09.211Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/unstop-c3b18/services/cloudfunctions.googleapis.com 200
+[debug] [2025-04-26T10:48:09.212Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/unstop-c3b18/services/cloudfunctions.googleapis.com [omitted]
+[info] Let's create a new codebase for your functions.
+[info] A directory corresponding to the codebase will be created in your project
+[info] with sample code pre-configured.
+
+[info] See https://firebase.google.com/docs/functions/organize-functions for
+[info] more information on organizing your functions using codebases.
+
+[info] Functions can be deployed with firebase deploy.
+
+[info] ✔  Wrote functions/package.json 
+[info] ✔  Wrote functions/.eslintrc.js 
+[info] ✔  Wrote functions/index.js 
+[info] ✔  Wrote functions/.gitignore 
+[info] 
+[error] NPM install failed, continuing with Firebase initialization...
+[info] 
+[info] i  Writing configuration info to firebase.json... 
+[info] i  Writing project information to .firebaserc... 
+[info] 
+[info] ✔  Firebase initialization complete! 
+[debug] [2025-04-26T10:51:16.679Z] Error: Timed out.
+    at Timeout._onTimeout (/Users/hammadahmad/.cache/firebase/tools/lib/node_modules/firebase-tools/lib/utils.js:254:49)
+    at listOnTimeout (node:internal/timers:559:17)
+    at processTimers (node:internal/timers:502:7)
+[error] 
+[error] Error: An unexpected error has occurred.
