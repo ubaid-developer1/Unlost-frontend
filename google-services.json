@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "1011076755867",
+    "project_id": "un-lost-2dab2",
+    "storage_bucket": "un-lost-2dab2.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1011076755867:android:79625ad34dd64682f6f13e",
+        "android_client_info": {
+          "package_name": "com.hassan7865.Organizor"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1011076755867-kpn4hlgclsec1jt0iv58fl01645jd3rg.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.hassan7865.Organizor",
+            "certificate_hash": "22bc7e979fdd7d208fe8dd9484e5fbd8d9938b18"
+          }
+        },
+        {
+          "client_id": "1011076755867-b06skhan44rb4ca3cr192mh3mok6fqr2.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCFTjE-scf9BNBIaBoj-74gBgawiDBxlz8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1011076755867-b06skhan44rb4ca3cr192mh3mok6fqr2.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "781314362030",
+    "project_id": "unstop-c3b18",
+    "storage_bucket": "unstop-c3b18.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:781314362030:android:c36d09ba9cccd044b0fb3f",
+        "android_client_info": {
+          "package_name": "com.example.unstop"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDHk-1sDu0ytivd9fUYVf5mU_uKaMd2W44"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:781314362030:android:164fbb5344f820e7b0fb3f",
+        "android_client_info": {
+          "package_name": "com.worldresolutions.unlost"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDHk-1sDu0ytivd9fUYVf5mU_uKaMd2W44"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
