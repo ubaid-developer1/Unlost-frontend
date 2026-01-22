@@ -713,55 +713,55 @@ class _EditItemScreenState extends State<EditItemScreen> {
             const SizedBox(height: 20),
             
             // 🔔 Notification Toggle Section - Only show when item is selected
-            if (selectedItemId != null) ...[
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.grey[100],
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Colors.grey[300]!),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      '🔔 Notification Settings',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    const Text(
-                      'Toggle notifications for this item',
-                      style: TextStyle(fontSize: 14, color: Colors.grey),
-                    ),
-                    const SizedBox(height: 12),
-                    FutureBuilder<bool>(
-                      future: areNotificationsEnabledForItem(selectedItemId!),
-                      builder: (context, snapshot) {
-                        final isEnabled = snapshot.data ?? false;
-                        return Row(
-                          children: [
-                            Expanded(
-                              child: customButton(
-                                label: isEnabled ? '🔕 Disable Notifications' : '🔔 Enable Notifications',
-                                color: isEnabled ? Colors.orange : Colors.green,
-                                icon: isEnabled ? Icons.notifications_off : Icons.notifications,
-                                onPressed: () {
-                                  _handleNotificationToggle(isEnabled);
-                                },
-                              ),
-                            ),
-                          ],
-                        );
-                      },
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 20),
-            ],
+            // if (selectedItemId != null) ...[
+            //   Container(
+            //     padding: const EdgeInsets.all(16),
+            //     decoration: BoxDecoration(
+            //       color: Colors.grey[100],
+            //       borderRadius: BorderRadius.circular(8),
+            //       border: Border.all(color: Colors.grey[300]!),
+            //     ),
+            //     child: Column(
+            //       crossAxisAlignment: CrossAxisAlignment.start,
+            //       children: [
+            //         const Text(
+            //           '🔔 Notification Settings',
+            //           style: TextStyle(
+            //             fontSize: 16,
+            //             fontWeight: FontWeight.bold,
+            //           ),
+            //         ),
+            //         const SizedBox(height: 8),
+            //         const Text(
+            //           'Toggle notifications for this item',
+            //           style: TextStyle(fontSize: 14, color: Colors.grey),
+            //         ),
+            //         const SizedBox(height: 12),
+            //         FutureBuilder<bool>(
+            //           future: areNotificationsEnabledForItem(selectedItemId!),
+            //           builder: (context, snapshot) {
+            //             final isEnabled = snapshot.data ?? false;
+            //             return Row(
+            //               children: [
+            //                 Expanded(
+            //                   child: customButton(
+            //                     label: isEnabled ? '🔕 Disable Notifications' : '🔔 Enable Notifications',
+            //                     color: isEnabled ? Colors.orange : Colors.green,
+            //                     icon: isEnabled ? Icons.notifications_off : Icons.notifications,
+            //                     onPressed: () {
+            //                       _handleNotificationToggle(isEnabled);
+            //                     },
+            //                   ),
+            //                 ),
+            //               ],
+            //             );
+            //           },
+            //         ),
+            //       ],
+            //     ),
+            //   ),
+            //   const SizedBox(height: 20),
+            // ],
             
             const SizedBox(height: 20),
             Row(
